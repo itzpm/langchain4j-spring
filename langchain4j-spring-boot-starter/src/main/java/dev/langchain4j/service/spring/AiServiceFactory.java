@@ -110,7 +110,7 @@ class AiServiceFactory implements FactoryBean<Object> {
             builder = builder.moderationModel(moderationModel);
         }
 
-        if (tools != null) {
+        if (toolProvider != null) {
             builder = builder.toolProvider(toolProvider);
         }
 
