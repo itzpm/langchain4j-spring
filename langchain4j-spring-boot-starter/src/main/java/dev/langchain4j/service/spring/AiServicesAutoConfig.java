@@ -28,12 +28,9 @@ import org.springframework.context.annotation.Bean;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static dev.langchain4j.internal.Exceptions.illegalArgument;
 import static dev.langchain4j.internal.Utils.isNotNullOrBlank;
 import static dev.langchain4j.internal.Utils.isNullOrBlank;
 import static dev.langchain4j.service.IllegalConfigurationException.illegalConfiguration;
-import static dev.langchain4j.service.spring.AiServiceWiringMode.AUTOMATIC;
-import static dev.langchain4j.service.spring.AiServiceWiringMode.EXPLICIT;
 import static java.util.Arrays.asList;
 
 public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
@@ -169,7 +166,7 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
                         propertyValues
                 );
 
-                if (aiServiceAnnotation.tools() != null) {
+                if (aiServiceAnnotation.tools() != null && aiServiceAnnotation.tools().length > 0) {
                     propertyValues.add("tools", toManagedList(asList(aiServiceAnnotation.tools())));
                 } else {
                     propertyValues.add("tools", toManagedList(toolBeanNames));
