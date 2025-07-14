@@ -99,7 +99,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ChatModel.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.chatModel(),
                         chatModels,
                         "chatModel",
@@ -109,7 +108,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         StreamingChatModel.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.streamingChatModel(),
                         streamingChatModels,
                         "streamingChatModel",
@@ -119,7 +117,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ChatMemory.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.chatMemory(),
                         chatMemories,
                         "chatMemory",
@@ -129,7 +126,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ChatMemoryProvider.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.chatMemoryProvider(),
                         chatMemoryProviders,
                         "chatMemoryProvider",
@@ -139,7 +135,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ContentRetriever.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.contentRetriever(),
                         contentRetrievers,
                         "contentRetriever",
@@ -149,7 +144,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         RetrievalAugmentor.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.retrievalAugmentor(),
                         retrievalAugmentors,
                         "retrievalAugmentor",
@@ -159,7 +153,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ModerationModel.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.moderationModel(),
                         moderationModels,
                         "moderationModel",
@@ -169,7 +162,6 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
 
                 addBeanReference(
                         ToolProvider.class,
-                        aiServiceAnnotation,
                         aiServiceAnnotation.toolProvider(),
                         toolProviders,
                         "toolProvider",
@@ -177,12 +169,10 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
                         propertyValues
                 );
 
-                if (aiServiceAnnotation.wiringMode() == EXPLICIT) {
+                if (aiServiceAnnotation.tools() != null) {
                     propertyValues.add("tools", toManagedList(asList(aiServiceAnnotation.tools())));
-                } else if (aiServiceAnnotation.wiringMode() == AUTOMATIC) {
-                    propertyValues.add("tools", toManagedList(toolBeanNames));
                 } else {
-                    throw illegalArgument("Unknown wiring mode: " + aiServiceAnnotation.wiringMode());
+                    propertyValues.add("tools", toManagedList(toolBeanNames));
                 }
 
                 BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
@@ -197,24 +187,20 @@ public class AiServicesAutoConfig implements ApplicationEventPublisherAware {
     }
 
     private static void addBeanReference(Class<?> beanType,
-                                         AiService aiServiceAnnotation,
                                          String customBeanName,
                                          String[] beanNames,
                                          String annotationAttributeName,
                                          String factoryPropertyName,
                                          MutablePropertyValues propertyValues) {
-        if (aiServiceAnnotation.wiringMode() == EXPLICIT) {
-            if (isNotNullOrBlank(customBeanName)) {
-                propertyValues.add(factoryPropertyName, new RuntimeBeanReference(customBeanName));
-            }
-        } else if (aiServiceAnnotation.wiringMode() == AUTOMATIC) {
+        // DO NOT USE wiringMode
+        if (isNotNullOrBlank(customBeanName)) {
+            propertyValues.add(factoryPropertyName, new RuntimeBeanReference(customBeanName));
+        } else {
             if (beanNames.length == 1) {
                 propertyValues.add(factoryPropertyName, new RuntimeBeanReference(beanNames[0]));
             } else if (beanNames.length > 1) {
                 throw conflict(beanType, beanNames, annotationAttributeName);
             }
-        } else {
-            throw illegalArgument("Unknown wiring mode: " + aiServiceAnnotation.wiringMode());
         }
     }
 

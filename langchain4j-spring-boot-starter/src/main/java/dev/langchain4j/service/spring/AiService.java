@@ -54,9 +54,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface AiService {
 
+
     /**
      * Specifies how LangChain4j components (beans) are wired (injected) into this AI Service.
      */
+    @Deprecated(forRemoval = true)
     AiServiceWiringMode wiringMode() default AUTOMATIC;
 
     /**
